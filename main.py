@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pickle as pkl
 
 import streamlit as st
 
@@ -26,28 +27,16 @@ with st.sidebar:
     
     st.write('---')
 
-    st.markdown('[___DataFrame___](#dataframe)')
-    st.markdown(f'''<span style="color:green">●</span> [Data Shape](#data-shape) ''', unsafe_allow_html=True)
-    st.markdown(f'''<span style="color:green">●</span> [Data Description table](#data-description-table) ''', unsafe_allow_html=True)
-    st.markdown(f'''<span style="color:green">●</span> [Dataset Details table](#dataset-details-table) ''', unsafe_allow_html=True)
-    st.markdown(f'''<span style="color:green">●</span> [Numerical Data Types](#numerical-data-types-in-the-dataframe) ''', unsafe_allow_html=True)
-    st.markdown(f'''<span style="color:green">●</span> [Categorical Data Types](#categorical-data-types-in-the-dataframe) ''', unsafe_allow_html=True)
-
-    # for i in dataframe_arr:
-    #     st.markdown(f'''<span style="color:green">●</span> [{i}] ''', unsafe_allow_html=True)
+    st.markdown(f'''<span style="color:black">●</span> [___DataFrame___](#dataframe)''', unsafe_allow_html=True)
     
-    st.markdown('[___Visualizations___](#visualizations)')
-    st.markdown(f'''<span style="color:red">●</span> [Heatmap of the correlation of the numerical values](#heatmap-of-the-correlation-of-the-numerical-values) ''', unsafe_allow_html=True)
-    st.markdown(f'''<span style="color:red">●</span> [Barplot of ____"Volume with respect to the year"___](#barplot-of-volume-with-respect-to-the-year) ''', unsafe_allow_html=True)
-    st.markdown(f'''<span style="color:red">●</span> [Lineplot of ____"Volume with respect to the year"___](#lineplot-of-volume-with-respect-to-the-year) ''', unsafe_allow_html=True)
-    st.markdown(f'''<span style="color:red">●</span> [Lineplot of ___"Close with respect to the year"___](#lineplot-of-close-with-respect-to-the-year) ''', unsafe_allow_html=True)
-    st.markdown(f'''<span style="color:red">●</span> [Linechart of ___Close___](#linechart-of-close) ''', unsafe_allow_html=True)
-    st.markdown(f'''<span style="color:red">●</span> [Linechart of ___Volume___](#linechart-of-volume) ''', unsafe_allow_html=True)
+    st.markdown(f'''<span style="color:black">●</span> [___Visualizations___](#visualizations)''', unsafe_allow_html=True)
 
-    # for j in visualization_arr:
-    #     st.markdown(f'''<span style="color:red">●</span> {j}''', unsafe_allow_html=True)
+    st.markdown(f'''<span style="color:black">●</span> [___Linera regression model___](#linear-regression-model)''', unsafe_allow_html=True)
 
-    # st.markdown('''Created with ❤️ by [aakas](https://aakas.com.np).''')
+    st.markdown('''
+    ---
+    Created with ❤️ by [aakas](https://aakas.com.np).
+    ''')
 
 st.title("📈 Nabil Bank Share Price EDA 📈")
 st.write('''
@@ -106,7 +95,7 @@ colors = ['#ED72A3','#8565F0','#22559C', '#F27370','#FA9856','#EDE862']
 
 st.subheader('Heatmap of the correlation of the numerical values')
 fig= plt.figure()
-sns.heatmap(df.corr(), annot=True, fmt='.1f')
+sns.heatmap(numerical_dtypes.corr(), annot=True, fmt='.1f')
 st.pyplot(fig)
 
 
@@ -125,7 +114,7 @@ st.write(fig)
 st.write('---')
 st.subheader('__Lineplot of__ _"Volume with respect to the year"_')
 fig, ax= plt.subplots()
-sns.lineplot(data=df, x='Year', y='Volume', palette=colors, errorbar=None)
+sns.lineplot(data=df, x='Year', y='Volume', errorbar=None)
 st.write(fig)
 
 st.write('---')
@@ -135,16 +124,42 @@ sns.lineplot(data=df, x='Year', y='Close', errorbar=None)
 st.write(fig)
 
 
-
-
-# fig=plt.figure(figsize=(15,7))
-# plt.plot(df['Date'], df['Volume'])
-# st.pyplot(fig)
 st.write('---')
 st.subheader('__Linechart__ of _Close_')
-st.line_chart(df['Close'])
+st.line_chart(data=df, x='Date', y='Close')
 
 st.write('---')
 st.subheader('__Linechart__ of _Volume_')
-st.line_chart(df['Volume'])
+st.line_chart(data=df, x='Date', y='Volume')
 
+
+################################## Linear Regression Model ########################################
+
+st.subheader('Linear Regression Model')
+st.write('''
+---
+    In this section we will be using the linear regression model to predict the closing price of the stock.
+    To predict the closing price of the stock we will be using the following features:
+    1. Open
+    2. High
+    3. Low
+''')
+
+
+model = pkl.load(open('model.pkl', 'rb'))
+
+st.write('Enter the values for the following features to predict the closing price of the stock.')
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    open = st.number_input('Open', min_value=0.0, max_value=100000.0, value=0.0, on_change=None)
+with col2:
+    high = st.number_input('High', min_value=0.0, max_value=100000.0, value=0.0, on_change=None)
+with col3:
+    low = st.number_input('Low', min_value=0.0, max_value=100000.0, value=0.0, on_change=None)
+    
+
+if st.button('Predict'):
+    volume = model.predict([[open, high, low]])
+    st.write(f'The predicted closing price of the stock is: {volume[0]}')
