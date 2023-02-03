@@ -31,7 +31,7 @@ with st.sidebar:
     
     st.markdown(f'''<span style="color:black">●</span> [___Visualizations___](#visualizations)''', unsafe_allow_html=True)
 
-    st.markdown(f'''<span style="color:black">●</span> [___Linera regression model___](#linear-regression-model)''', unsafe_allow_html=True)
+    st.markdown(f'''<span style="color:black">●</span> [___Linear regression model___](#linear-regression-model)''', unsafe_allow_html=True)
 
     st.markdown('''
     ---
@@ -162,4 +162,12 @@ with col3:
 
 if st.button('Predict'):
     volume = model.predict([[open, high, low]])
-    st.write(f'The predicted closing price of the stock is: {volume[0]}')
+    st.markdown("""
+    <style>
+    .result{
+        font-size: 20px;
+        color: black;
+        background-color: #6096B4;
+    }
+    </style> """ + f"""
+    <p class='result'>The predicted closing price of the stock is:    {volume[0][0]}</p>""", unsafe_allow_html=True)
